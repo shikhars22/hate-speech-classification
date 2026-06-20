@@ -19,38 +19,43 @@ jobs:
           platform: linux/amd64
           push-image: true
           region: '${AWS_REGION}'
-          repo: demo
+          repo: hate-speech-classification
           registry-id: AWS_ECR_REGISTRY_ID
           repo-scan-on-push: true
           tag: latest
 
   continuous-delivery:
     machine: true
-    resource_class: bappy/haterunner
+    resource_class: skgworks/deployments
     steps:
       - aws-cli/setup
 
       - run:
           name: auth to aws ecr
-          command: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 136566696263.dkr.ecr.us-east-1.amazonaws.com
-          
-          
+          command: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 844099234694.dkr.ecr.ap-south-1.amazonaws.com
 
       - run:
           name: pull image from private repository
-          command: docker pull 136566696263.dkr.ecr.us-east-1.amazonaws.com/demo:latest
-          
-      
+          command: docker pull 844099234694.dkr.ecr.ap-south-1.amazonaws.com/hate-speech-classification:latest
+
+      - run:
+          name: stop existing container
+          command: docker rm -f nlp-app || true
+
       - run:
           name: run image
-          command: docker run -d -p 8080:8080 136566696263.dkr.ecr.us-east-1.amazonaws.com/demo:latest
+          command: docker run -d -p 8080:8080 --name nlp-app 844099234694.dkr.ecr.ap-south-1.amazonaws.com/hate-speech-classification:latest
+
+      - run:
+          name: clean unused docker images
+          command: docker image prune -f
 workflows:
   CICD:
     jobs:
       - continuous-integration
       - continuous-delivery:
           requires:
-          - continuous-integration
+            - continuous-integration
 
 
       
