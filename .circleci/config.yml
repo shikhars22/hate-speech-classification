@@ -25,7 +25,8 @@ jobs:
           tag: latest
 
   continuous-delivery:
-    machine: true
+    docker:
+      - image: cimg/base:current
     resource_class: skgworks/deployments
     steps:
       - aws-cli/setup
