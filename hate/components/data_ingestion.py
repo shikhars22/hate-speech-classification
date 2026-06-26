@@ -24,6 +24,17 @@ class DataIngestion:
                                                 self.data_ingestion_config.DATA_INGESTION_ARTIFACTS_DIR,
                                                 )
             
+            # Local fallback in case AWS S3 download fails or bucket is not yet configured
+            if not os.path.exists(self.data_ingestion_config.ZIP_FILE_PATH):
+                logging.info("S3 sync failed or file not found. Falling back to local data/dataset.zip")
+                import shutil
+                local_dataset = os.path.join("data", self.data_ingestion_config.ZIP_FILE_NAME)
+                if os.path.exists(local_dataset):
+                    shutil.copy(local_dataset, self.data_ingestion_config.ZIP_FILE_PATH)
+                    logging.info("Successfully copied local data/dataset.zip to artifacts directory")
+                else:
+                    raise Exception("Neither S3 bucket nor local data/dataset.zip is available")
+            
             logging.info("Exited the get_data_from_gcloud method of Data ingestion class")
 
         

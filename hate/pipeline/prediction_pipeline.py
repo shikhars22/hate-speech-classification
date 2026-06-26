@@ -36,6 +36,20 @@ class PredictionPipeline:
             os.makedirs(self.model_path, exist_ok=True)
             self.gcloud.sync_folder_from_gcloud(self.bucket_name, self.model_name, self.model_path)
             best_model_path = os.path.join(self.model_path, self.model_name)
+
+            # Fallback to check if a local model was trained/copied in case S3 copy failed
+            if not os.path.exists(best_model_path):
+                logging.info("Model not found in S3. Searching for a local model in artifacts...")
+                import glob
+                local_models = glob.glob(os.path.join("artifacts", "*", "ModelTrainerArtifacts", self.model_name))
+                if local_models:
+                    local_models.sort(key=os.path.getmtime, reverse=True)
+                    import shutil
+                    shutil.copy(local_models[0], best_model_path)
+                    logging.info(f"Copied local model {local_models[0]} to {best_model_path}")
+                else:
+                    logging.warning("No local model found in artifacts.")
+
             logging.info("Exited the get_model_from_gcloud method of PredictionPipeline class")
             return best_model_path
 

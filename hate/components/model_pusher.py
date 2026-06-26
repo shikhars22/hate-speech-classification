@@ -32,6 +32,17 @@ class ModelPusher:
 
             logging.info("Uploaded best model to gcloud storage")
 
+            # Also copy to local PredictModel folder for immediate offline/prediction access
+            import shutil
+            import os
+            local_predict_model_path = os.path.join("artifacts", "PredictModel")
+            os.makedirs(local_predict_model_path, exist_ok=True)
+            shutil.copy(
+                os.path.join(self.model_pusher_config.TRAINED_MODEL_PATH, self.model_pusher_config.MODEL_NAME),
+                os.path.join(local_predict_model_path, self.model_pusher_config.MODEL_NAME)
+            )
+            logging.info("Copied trained model to local PredictModel directory for prediction fallback")
+
             # Saving the model pusher artifacts
             model_pusher_artifact = ModelPusherArtifacts(
                 bucket_name=self.model_pusher_config.BUCKET_NAME
