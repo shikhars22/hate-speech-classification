@@ -26,7 +26,7 @@ sudo apt-get install -y circleci-runner
 sudo mkdir -p /etc/circleci-runner
 cat << 'EOF' | sudo tee /etc/circleci-runner/circleci-runner-config.yaml > /dev/null
 api:
-  auth_token: "17f70d59d059a9c24d6e37d51afb969f8ccf10124be54033a0a2b0f8a645a7e187ec1551d3d07042"
+  auth_token: "2b2ca47aa216fdf4361ca74467bfd53c58b0e190262b73b28ab1a30920f942b00037571454b5fcf0"
 
 runner:
   name: "self-hosted"

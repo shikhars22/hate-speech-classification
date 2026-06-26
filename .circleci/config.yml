@@ -27,7 +27,7 @@ jobs:
   continuous-delivery:
     docker:
       - image: cimg/base:current
-    resource_class: skgworks/deployments
+    resource_class: shikhars22/deployments
     steps:
       - aws-cli/setup
 
