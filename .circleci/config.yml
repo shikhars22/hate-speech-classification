@@ -9,7 +9,7 @@ jobs:
     resource_class: medium
     steps:
       - setup_remote_docker:
-          version: 20.10.14
+          version: docker24
           docker_layer_caching: false
 
       - aws-ecr/build-and-push-image:
@@ -18,7 +18,6 @@ jobs:
           path: .
           platform: linux/amd64
           push-image: true
-          region: '${AWS_REGION}'
           repo: hate-speech-classification
           registry-id: AWS_ECR_REGISTRY_ID
           repo-scan-on-push: true
