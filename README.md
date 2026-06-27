@@ -64,6 +64,10 @@ Launch a target EC2 instance with the following specifications to act as the dep
 * **Instance Type:** `t2.large` (2 vCPUs, 8 GiB RAM). *Note: TensorFlow/Keras deep learning models require at least 8 GiB RAM to train and execute without triggering Out-Of-Memory (OOM) failures.*
 * **Storage (EBS Volume):** `32 GB` (General Purpose SSD - gp3) or more. This provides sufficient disk space for the OS, Docker images, build layers, and pipeline cache.
 * **Operating System:** `Ubuntu 22.04 LTS` (64-bit x86).
+* **IAM Instance Profile (IAM Role):** Attach an IAM role (e.g., `ec2-ecr-role`) to the EC2 instance. This role must have policies allowing:
+  * ECR access (`AmazonEC2ContainerRegistryReadOnly`) to pull the application image.
+  * S3 access (`AmazonS3FullAccess` or a custom read/write policy) to read datasets and save models.
+  * *Why:* This allows the self-hosted CircleCI runner and Docker on the EC2 machine to securely pull images from ECR and sync with S3 using temporary instance profile credentials, without storing any AWS access keys on the host.
 * **Security Group Inbound Rules:**
   * **SSH (Port 22):** Restricted to your IP address (for secure server management).
   * **Custom TCP (Port 8080):** Set to anywhere (`0.0.0.0/0`) or your IP (to access the FastAPI web API and docs).
