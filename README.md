@@ -59,7 +59,16 @@ Create an S3 bucket to persist the model artifacts and datasets:
 * **Bucket Name:** `hate-speech-classification-844099234694` (must be globally unique, defined in [constants/__init__.py](file:///c:/Users/shikh/Downloads/code/gitHub/MLOpsLearning/nlp-project/hate/constants/__init__.py))
 * **Region:** `ap-south-1`
 
-#### 4. CircleCI Project Settings
+#### 4. AWS EC2 Host Provisioning (Target Instance)
+Launch a target EC2 instance with the following specifications to act as the deployment server and host the CircleCI self-hosted runner:
+* **Instance Type:** `t2.large` (2 vCPUs, 8 GiB RAM). *Note: TensorFlow/Keras deep learning models require at least 8 GiB RAM to train and execute without triggering Out-Of-Memory (OOM) failures.*
+* **Storage (EBS Volume):** `32 GB` (General Purpose SSD - gp3) or more. This provides sufficient disk space for the OS, Docker images, build layers, and pipeline cache.
+* **Operating System:** `Ubuntu 22.04 LTS` (64-bit x86).
+* **Security Group Inbound Rules:**
+  * **SSH (Port 22):** Restricted to your IP address (for secure server management).
+  * **Custom TCP (Port 8080):** Set to anywhere (`0.0.0.0/0`) or your IP (to access the FastAPI web API and docs).
+
+#### 5. CircleCI Project Settings
 Navigate to your CircleCI project settings and configure the following Environment Variables:
 * `AWS_ACCESS_KEY_ID`: IAM user access key
 * `AWS_SECRET_ACCESS_KEY`: IAM user secret key
