@@ -27,8 +27,6 @@ jobs:
     machine: true
     resource_class: shikhars22/deployments
     steps:
-      - aws-cli/setup
-
       - run:
           name: auth to aws ecr
           command: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 844099234694.dkr.ecr.ap-south-1.amazonaws.com
