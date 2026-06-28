@@ -34,7 +34,58 @@ Launch a target EC2 instance with the following specifications to act as the dep
   * **SSH (Port 22):** Restricted to your IP address (for secure server management).
   * **Custom TCP (Port 8080):** Set to anywhere (`0.0.0.0/0`) or your IP (to access the FastAPI web API and docs).
 
-#### 5. CircleCI Project Settings
+#### 5. EC2 Setup & Installation Commands
+Connect to your Ubuntu EC2 instance via SSH and run the following commands to install Docker, the CircleCI Runner, and set up permissions:
+
+##### A. Install Docker
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+##### B. Install CircleCI self-hosted Machine Runner
+```bash
+curl -s https://packagecloud.io/install/repositories/circleci/runner/script.deb.sh | sudo bash
+sudo apt-get install -y circleci-runner
+```
+
+##### C. Configure the Runner Token
+Open the configuration file:
+```bash
+sudo nano /etc/circleci-runner/circleci-runner.yml
+```
+Update the `auth_token` with your CircleCI resource class token:
+```yaml
+api:
+  auth_token: "YOUR_CIRCLECI_RESOURCE_CLASS_TOKEN"
+runner:
+  name: "hate-speech-ec2-runner"
+  working_directory: "/var/opt/circleci-runner/workdir"
+  cleanup_working_directory: true
+```
+
+##### D. Authorize Runner to use Docker (Non-Root Access)
+Add the `circleci-runner` user to the `docker` group so the agent can pull and run containers without `sudo`:
+```bash
+sudo usermod -aG docker circleci-runner
+```
+
+##### E. Start and Enable the Runner Service
+```bash
+sudo systemctl enable circleci-runner
+sudo systemctl start circleci-runner
+```
+
+##### F. Verify Runner is Active
+```bash
+sudo systemctl status circleci-runner
+# Or view live runner logs:
+journalctl -u circleci-runner -f
+```
+
+#### 6. CircleCI Project Settings
 Navigate to your CircleCI project settings and configure the following Environment Variables:
 * `AWS_ACCESS_KEY_ID`: IAM user access key
 * `AWS_SECRET_ACCESS_KEY`: IAM user secret key
